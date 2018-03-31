@@ -13,9 +13,19 @@
 import express from 'express';
 import graphQLHTTP from 'express-graphql';
 import path from 'path';
+import {graphql} from 'graphql';
 import webpack from 'webpack';
 import WebpackDevServer from 'webpack-dev-server';
 import {schema} from './data/schema';
+import ReactDOMServer from 'react-dom/server';
+import React from 'react';
+import {
+  Environment,
+  Network,
+  RecordSource,
+  Store,
+} from 'relay-runtime';
+import TodoAppRoot from './js/TodoAppRoot';
 
 const APP_PORT = 3000;
 
@@ -42,10 +52,56 @@ const compiler = webpack({
     path: '/',
   },
 });
+
+
 const app = new WebpackDevServer(compiler, {
   contentBase: '/public/',
   publicPath: '/js/',
   stats: {colors: true},
+  before: (app) => {
+    app.get('/ssr', async (req, res) => {
+      res.set('Content-Type', 'text/html');
+
+      const queryText = require('./js/__generated__/appQuery.graphql').text;
+      const queryResponse = await graphql(schema, queryText);
+
+      // Create a mock network layer that only knows how to respond to the apps
+      // one GraphQL request for initial render.
+      // The key here is that it responds asynchronously which allows
+      // react-relay to skip the loading state and go straight to fully rendered
+      // app.
+      const serverNetwork = Network.create((graphQLRequest) => {
+        if (graphQLRequest.text !== queryText) {
+          console.error('unexpected query in ssr mode');
+          process.exit();
+        }
+        return queryResponse;
+      })
+
+      const environment = new Environment({
+        network: serverNetwork,
+        store: new Store(new RecordSource()),
+      });
+
+      const serverRendered = ReactDOMServer.renderToString(
+        <TodoAppRoot environment={environment} />
+      );
+      res.send(`<!doctype html>
+<html lang="en" data-framework="relay">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Relay • TodoMVC</title>
+    <link rel="stylesheet" href="base.css">
+    <link rel="stylesheet" href="index.css">
+  </head>
+  <body>
+    ${serverRendered}
+  </body>
+</html>`
+      );
+    })
+  },
 });
 
 // Serve static resources
