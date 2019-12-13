@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 2e1235ca40b6161f5531cab5a24486bf
+ * @relayHash 9b59adaadbe575a0ffd243764cbfe932
  */
 
 /* eslint-disable */
@@ -9,12 +9,8 @@
 
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
-export type RemoveCompletedTodosInput = {|
-  userId: string,
-  clientMutationId?: ?string,
-|};
 export type RemoveCompletedTodosMutationVariables = {|
-  input: RemoveCompletedTodosInput
+  userId: string
 |};
 export type RemoveCompletedTodosMutationResponse = {|
   +removeCompletedTodos: ?{|
@@ -34,9 +30,9 @@ export type RemoveCompletedTodosMutation = {|
 
 /*
 mutation RemoveCompletedTodosMutation(
-  $input: RemoveCompletedTodosInput!
+  $userId: ID!
 ) {
-  removeCompletedTodos(input: $input) {
+  removeCompletedTodos(userId: $userId) {
     deletedTodoIds
     user {
       completedCount
@@ -51,16 +47,16 @@ const node/*: ConcreteRequest*/ = (function(){
 var v0 = [
   {
     "kind": "LocalArgument",
-    "name": "input",
-    "type": "RemoveCompletedTodosInput!",
+    "name": "userId",
+    "type": "ID!",
     "defaultValue": null
   }
 ],
 v1 = [
   {
     "kind": "Variable",
-    "name": "input",
-    "variableName": "input"
+    "name": "userId",
+    "variableName": "userId"
   }
 ],
 v2 = {
@@ -163,11 +159,11 @@ return {
     "operationKind": "mutation",
     "name": "RemoveCompletedTodosMutation",
     "id": null,
-    "text": "mutation RemoveCompletedTodosMutation(\n  $input: RemoveCompletedTodosInput!\n) {\n  removeCompletedTodos(input: $input) {\n    deletedTodoIds\n    user {\n      completedCount\n      totalCount\n      id\n    }\n  }\n}\n",
+    "text": "mutation RemoveCompletedTodosMutation(\n  $userId: ID!\n) {\n  removeCompletedTodos(userId: $userId) {\n    deletedTodoIds\n    user {\n      completedCount\n      totalCount\n      id\n    }\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '9165a0685be5ff8f0b36e5449a8bbcf9';
+(node/*: any*/).hash = 'c62b2f156221c6bef190435799445acf';
 module.exports = node;

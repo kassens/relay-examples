@@ -13,12 +13,14 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import {
-  cursorForObjectInConnection,
-  mutationWithClientMutationId,
-} from 'graphql-relay';
+import {cursorForObjectInConnection} from 'graphql-relay';
 
-import {GraphQLID, GraphQLNonNull, GraphQLString} from 'graphql';
+import {
+  GraphQLID,
+  GraphQLNonNull,
+  GraphQLObjectType,
+  GraphQLString,
+} from 'graphql';
 import {GraphQLTodoEdge, GraphQLUser} from '../nodes';
 
 import {
@@ -29,44 +31,46 @@ import {
   User,
 } from '../../database';
 
-type Input = {|
+type Input = {
   +text: string,
   +userId: string,
-|};
+  ...
+};
 
 type Payload = {|
   +todoId: string,
   +userId: string,
 |};
 
-const AddTodoMutation = mutationWithClientMutationId({
-  name: 'AddTodo',
-  inputFields: {
+const AddTodoMutation = {
+  args: {
     text: {type: new GraphQLNonNull(GraphQLString)},
     userId: {type: new GraphQLNonNull(GraphQLID)},
   },
-  outputFields: {
-    todoEdge: {
-      type: new GraphQLNonNull(GraphQLTodoEdge),
-      resolve: ({todoId}: Payload) => {
-        const todo = getTodoOrThrow(todoId);
+  type: new GraphQLObjectType({
+    name: 'AddTodoPayload',
+    fields: {
+      todoEdge: {
+        type: new GraphQLNonNull(GraphQLTodoEdge),
+        resolve: ({todoId}: Payload) => {
+          const todo = getTodoOrThrow(todoId);
 
-        return {
-          cursor: cursorForObjectInConnection([...getTodos()], todo),
-          node: todo,
-        };
+          return {
+            cursor: cursorForObjectInConnection([...getTodos()], todo),
+            node: todo,
+          };
+        },
+      },
+      user: {
+        type: new GraphQLNonNull(GraphQLUser),
+        resolve: ({userId}: Payload): User => getUserOrThrow(userId),
       },
     },
-    user: {
-      type: new GraphQLNonNull(GraphQLUser),
-      resolve: ({userId}: Payload): User => getUserOrThrow(userId),
-    },
-  },
-  mutateAndGetPayload: ({text, userId}: Input): Payload => {
+  }),
+  resolve: (_: mixed, {text, userId}: Input) => {
     const todoId = addTodo(text, false);
-
     return {todoId, userId};
   },
-});
+};
 
 export {AddTodoMutation};

@@ -20,14 +20,15 @@ import {
 
 import type {Todo_todo} from 'relay/Todo_todo.graphql';
 import type {Todo_user} from 'relay/Todo_user.graphql';
-import type {
-  ChangeTodoStatusInput,
-  ChangeTodoStatusMutationResponse,
-} from 'relay/ChangeTodoStatusMutation.graphql';
+import type {ChangeTodoStatusMutationResponse} from 'relay/ChangeTodoStatusMutation.graphql';
 
 const mutation = graphql`
-  mutation ChangeTodoStatusMutation($input: ChangeTodoStatusInput!) {
-    changeTodoStatus(input: $input) {
+  mutation ChangeTodoStatusMutation(
+    $complete: Boolean!
+    $id: ID!
+    $userId: ID!
+  ) {
+    changeTodoStatus(complete: $complete, id: $id, userId: $userId) {
       todo {
         id
         complete
@@ -67,16 +68,12 @@ function commit(
   todo: Todo_todo,
   user: Todo_user,
 ): Disposable {
-  const input: ChangeTodoStatusInput = {
-    complete,
-    userId: user.userId,
-    id: todo.id,
-  };
-
   return commitMutation(environment, {
     mutation,
     variables: {
-      input,
+      complete,
+      userId: user.userId,
+      id: todo.id,
     },
     optimisticResponse: getOptimisticResponse(complete, todo, user),
   });

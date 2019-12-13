@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 553db2ae92d68bc35526ee8b1f0e0ea7
+ * @relayHash 714a9902fec3933e707bb82db5170776
  */
 
 /* eslint-disable */
@@ -9,13 +9,9 @@
 
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
-export type AddTodoInput = {|
+export type AddTodoMutationVariables = {|
   text: string,
   userId: string,
-  clientMutationId?: ?string,
-|};
-export type AddTodoMutationVariables = {|
-  input: AddTodoInput
 |};
 export type AddTodoMutationResponse = {|
   +addTodo: ?{|
@@ -43,9 +39,10 @@ export type AddTodoMutation = {|
 
 /*
 mutation AddTodoMutation(
-  $input: AddTodoInput!
+  $text: String!
+  $userId: ID!
 ) {
-  addTodo(input: $input) {
+  addTodo(text: $text, userId: $userId) {
     todoEdge {
       __typename
       cursor
@@ -67,8 +64,14 @@ const node/*: ConcreteRequest*/ = (function(){
 var v0 = [
   {
     "kind": "LocalArgument",
-    "name": "input",
-    "type": "AddTodoInput!",
+    "name": "text",
+    "type": "String!",
+    "defaultValue": null
+  },
+  {
+    "kind": "LocalArgument",
+    "name": "userId",
+    "type": "ID!",
     "defaultValue": null
   }
 ],
@@ -88,8 +91,13 @@ v2 = [
     "args": [
       {
         "kind": "Variable",
-        "name": "input",
-        "variableName": "input"
+        "name": "text",
+        "variableName": "text"
+      },
+      {
+        "kind": "Variable",
+        "name": "userId",
+        "variableName": "userId"
       }
     ],
     "concreteType": "AddTodoPayload",
@@ -188,11 +196,11 @@ return {
     "operationKind": "mutation",
     "name": "AddTodoMutation",
     "id": null,
-    "text": "mutation AddTodoMutation(\n  $input: AddTodoInput!\n) {\n  addTodo(input: $input) {\n    todoEdge {\n      __typename\n      cursor\n      node {\n        complete\n        id\n        text\n      }\n    }\n    user {\n      id\n      totalCount\n    }\n  }\n}\n",
+    "text": "mutation AddTodoMutation(\n  $text: String!\n  $userId: ID!\n) {\n  addTodo(text: $text, userId: $userId) {\n    todoEdge {\n      __typename\n      cursor\n      node {\n        complete\n        id\n        text\n      }\n    }\n    user {\n      id\n      totalCount\n    }\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = 'c1931cfe1fd48fc43dedf1779558f244';
+(node/*: any*/).hash = '2027462ef6239c1b2a2950e2e6849d08';
 module.exports = node;

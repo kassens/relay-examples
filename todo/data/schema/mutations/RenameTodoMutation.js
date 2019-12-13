@@ -13,38 +13,45 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import {mutationWithClientMutationId, fromGlobalId} from 'graphql-relay';
-import {GraphQLID, GraphQLNonNull, GraphQLString} from 'graphql';
+import {fromGlobalId} from 'graphql-relay';
+import {
+  GraphQLID,
+  GraphQLObjectType,
+  GraphQLNonNull,
+  GraphQLString,
+} from 'graphql';
 import {GraphQLTodo} from '../nodes';
 import {getTodoOrThrow, renameTodo, Todo} from '../../database';
 
-type Input = {|
+type Input = {
   +id: string,
   +text: string,
-|};
+  ...
+};
 
 type Payload = {|
   +localTodoId: string,
 |};
 
-const RenameTodoMutation = mutationWithClientMutationId({
-  name: 'RenameTodo',
-  inputFields: {
+const RenameTodoMutation = {
+  args: {
     id: {type: new GraphQLNonNull(GraphQLID)},
     text: {type: new GraphQLNonNull(GraphQLString)},
   },
-  outputFields: {
-    todo: {
-      type: new GraphQLNonNull(GraphQLTodo),
-      resolve: ({localTodoId}: Payload): Todo => getTodoOrThrow(localTodoId),
+  type: new GraphQLObjectType({
+    name: 'RenameTodoPayload',
+    fields: {
+      todo: {
+        type: new GraphQLNonNull(GraphQLTodo),
+        resolve: ({localTodoId}: Payload): Todo => getTodoOrThrow(localTodoId),
+      },
     },
-  },
-  mutateAndGetPayload: ({id, text}: Input): Payload => {
+  }),
+  resolve: (_: mixed, {id, text}: Input): Payload => {
     const localTodoId = fromGlobalId(id).id;
     renameTodo(localTodoId, text);
-
     return {localTodoId};
   },
-});
+};
 
 export {RenameTodoMutation};

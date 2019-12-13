@@ -20,7 +20,6 @@ import {
 } from 'react-relay';
 
 import {ConnectionHandler} from 'relay-runtime';
-import type {RemoveCompletedTodosInput} from 'relay/RemoveCompletedTodosMutation.graphql';
 
 import type {TodoListFooter_user} from 'relay/TodoListFooter_user.graphql';
 type Todos = $NonMaybeType<$ElementType<TodoListFooter_user, 'todos'>>;
@@ -29,8 +28,8 @@ type Edge = $NonMaybeType<$ElementType<Edges, number>>;
 type Node = $NonMaybeType<$ElementType<Edge, 'node'>>;
 
 const mutation = graphql`
-  mutation RemoveCompletedTodosMutation($input: RemoveCompletedTodosInput!) {
-    removeCompletedTodos(input: $input) {
+  mutation RemoveCompletedTodosMutation($userId: ID!) {
+    removeCompletedTodos(userId: $userId) {
       deletedTodoIds
       user {
         completedCount
@@ -59,14 +58,10 @@ function commit(
   todos: Todos,
   user: TodoListFooter_user,
 ): Disposable {
-  const input: RemoveCompletedTodosInput = {
-    userId: user.userId,
-  };
-
   return commitMutation(environment, {
     mutation,
     variables: {
-      input,
+      userId: user.userId,
     },
     updater: (store: RecordSourceSelectorProxy) => {
       const payload = store.getRootField('removeCompletedTodos');

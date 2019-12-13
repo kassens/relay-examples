@@ -18,10 +18,7 @@ import {
   type Environment,
 } from 'react-relay';
 
-import type {
-  MarkAllTodosInput,
-  MarkAllTodosMutationResponse,
-} from 'relay/MarkAllTodosMutation.graphql';
+import type {MarkAllTodosMutationResponse} from 'relay/MarkAllTodosMutation.graphql';
 
 type MarkAllTodos = $NonMaybeType<
   $ElementType<MarkAllTodosMutationResponse, 'markAllTodos'>,
@@ -36,8 +33,8 @@ type Edge = $NonMaybeType<$ElementType<Edges, number>>;
 type Node = $NonMaybeType<$ElementType<Edge, 'node'>>;
 
 const mutation = graphql`
-  mutation MarkAllTodosMutation($input: MarkAllTodosInput!) {
-    markAllTodos(input: $input) {
+  mutation MarkAllTodosMutation($complete: Boolean!, $userId: ID!) {
+    markAllTodos(complete: $complete, userId: $userId) {
       changedTodos {
         id
         complete
@@ -87,15 +84,11 @@ function commit(
   todos: Todos,
   user: TodoList_user,
 ): Disposable {
-  const input: MarkAllTodosInput = {
-    complete,
-    userId: user.userId,
-  };
-
   return commitMutation(environment, {
     mutation,
     variables: {
-      input,
+      complete,
+      userId: user.userId,
     },
     optimisticResponse: getOptimisticResponse(complete, todos, user),
   });

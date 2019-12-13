@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash bd070297db36f06c6f9beb7f2cfc14fc
+ * @relayHash 7936dc0bb728edf9761c02e7a4428d36
  */
 
 /* eslint-disable */
@@ -9,13 +9,9 @@
 
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
-export type MarkAllTodosInput = {|
+export type MarkAllTodosMutationVariables = {|
   complete: boolean,
   userId: string,
-  clientMutationId?: ?string,
-|};
-export type MarkAllTodosMutationVariables = {|
-  input: MarkAllTodosInput
 |};
 export type MarkAllTodosMutationResponse = {|
   +markAllTodos: ?{|
@@ -38,9 +34,10 @@ export type MarkAllTodosMutation = {|
 
 /*
 mutation MarkAllTodosMutation(
-  $input: MarkAllTodosInput!
+  $complete: Boolean!
+  $userId: ID!
 ) {
-  markAllTodos(input: $input) {
+  markAllTodos(complete: $complete, userId: $userId) {
     changedTodos {
       id
       complete
@@ -57,8 +54,14 @@ const node/*: ConcreteRequest*/ = (function(){
 var v0 = [
   {
     "kind": "LocalArgument",
-    "name": "input",
-    "type": "MarkAllTodosInput!",
+    "name": "complete",
+    "type": "Boolean!",
+    "defaultValue": null
+  },
+  {
+    "kind": "LocalArgument",
+    "name": "userId",
+    "type": "ID!",
     "defaultValue": null
   }
 ],
@@ -78,8 +81,13 @@ v2 = [
     "args": [
       {
         "kind": "Variable",
-        "name": "input",
-        "variableName": "input"
+        "name": "complete",
+        "variableName": "complete"
+      },
+      {
+        "kind": "Variable",
+        "name": "userId",
+        "variableName": "userId"
       }
     ],
     "concreteType": "MarkAllTodosPayload",
@@ -146,11 +154,11 @@ return {
     "operationKind": "mutation",
     "name": "MarkAllTodosMutation",
     "id": null,
-    "text": "mutation MarkAllTodosMutation(\n  $input: MarkAllTodosInput!\n) {\n  markAllTodos(input: $input) {\n    changedTodos {\n      id\n      complete\n    }\n    user {\n      id\n      completedCount\n    }\n  }\n}\n",
+    "text": "mutation MarkAllTodosMutation(\n  $complete: Boolean!\n  $userId: ID!\n) {\n  markAllTodos(complete: $complete, userId: $userId) {\n    changedTodos {\n      id\n      complete\n    }\n    user {\n      id\n      completedCount\n    }\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '779c582c4ba0ee3c5be19942628dfaf3';
+(node/*: any*/).hash = '573f1d8a57940f58bc6621e411c4b0a7';
 module.exports = node;

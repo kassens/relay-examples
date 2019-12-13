@@ -22,11 +22,10 @@ import {
 
 import {ConnectionHandler} from 'relay-runtime';
 import type {TodoApp_user} from 'relay/TodoApp_user.graphql';
-import type {AddTodoInput} from 'relay/AddTodoMutation.graphql';
 
 const mutation = graphql`
-  mutation AddTodoMutation($input: AddTodoInput!) {
-    addTodo(input: $input) {
+  mutation AddTodoMutation($text: String!, $userId: ID!) {
+    addTodo(text: $text, userId: $userId) {
       todoEdge {
         __typename
         cursor
@@ -61,16 +60,11 @@ function commit(
   text: string,
   user: TodoApp_user,
 ): Disposable {
-  const input: AddTodoInput = {
-    text,
-    userId: user.userId,
-    clientMutationId: `${tempID++}`,
-  };
-
   return commitMutation(environment, {
     mutation,
     variables: {
-      input,
+      text,
+      userId: user.userId,
     },
     updater: (store: RecordSourceSelectorProxy) => {
       const payload = store.getRootField('addTodo');

@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 2ba6a127f5fc7f1d5db6f2247c0c5c15
+ * @relayHash c715caa241fa1f7c24e064359da62dc1
  */
 
 /* eslint-disable */
@@ -9,14 +9,10 @@
 
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
-export type ChangeTodoStatusInput = {|
+export type ChangeTodoStatusMutationVariables = {|
   complete: boolean,
   id: string,
   userId: string,
-  clientMutationId?: ?string,
-|};
-export type ChangeTodoStatusMutationVariables = {|
-  input: ChangeTodoStatusInput
 |};
 export type ChangeTodoStatusMutationResponse = {|
   +changeTodoStatus: ?{|
@@ -39,9 +35,11 @@ export type ChangeTodoStatusMutation = {|
 
 /*
 mutation ChangeTodoStatusMutation(
-  $input: ChangeTodoStatusInput!
+  $complete: Boolean!
+  $id: ID!
+  $userId: ID!
 ) {
-  changeTodoStatus(input: $input) {
+  changeTodoStatus(complete: $complete, id: $id, userId: $userId) {
     todo {
       id
       complete
@@ -58,8 +56,20 @@ const node/*: ConcreteRequest*/ = (function(){
 var v0 = [
   {
     "kind": "LocalArgument",
-    "name": "input",
-    "type": "ChangeTodoStatusInput!",
+    "name": "complete",
+    "type": "Boolean!",
+    "defaultValue": null
+  },
+  {
+    "kind": "LocalArgument",
+    "name": "id",
+    "type": "ID!",
+    "defaultValue": null
+  },
+  {
+    "kind": "LocalArgument",
+    "name": "userId",
+    "type": "ID!",
     "defaultValue": null
   }
 ],
@@ -79,8 +89,18 @@ v2 = [
     "args": [
       {
         "kind": "Variable",
-        "name": "input",
-        "variableName": "input"
+        "name": "complete",
+        "variableName": "complete"
+      },
+      {
+        "kind": "Variable",
+        "name": "id",
+        "variableName": "id"
+      },
+      {
+        "kind": "Variable",
+        "name": "userId",
+        "variableName": "userId"
       }
     ],
     "concreteType": "ChangeTodoStatusPayload",
@@ -147,11 +167,11 @@ return {
     "operationKind": "mutation",
     "name": "ChangeTodoStatusMutation",
     "id": null,
-    "text": "mutation ChangeTodoStatusMutation(\n  $input: ChangeTodoStatusInput!\n) {\n  changeTodoStatus(input: $input) {\n    todo {\n      id\n      complete\n    }\n    user {\n      id\n      completedCount\n    }\n  }\n}\n",
+    "text": "mutation ChangeTodoStatusMutation(\n  $complete: Boolean!\n  $id: ID!\n  $userId: ID!\n) {\n  changeTodoStatus(complete: $complete, id: $id, userId: $userId) {\n    todo {\n      id\n      complete\n    }\n    user {\n      id\n      completedCount\n    }\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = 'e232227a4f30f0e16f4e1e1a2e0cea75';
+(node/*: any*/).hash = '3e3b148d8bfeca25af88afb9a5f4bda5';
 module.exports = node;

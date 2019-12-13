@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 33792f404f742bd7adbadb9ac42b7055
+ * @relayHash 0261d3954d7a3d8e3ea8f75115869825
  */
 
 /* eslint-disable */
@@ -9,13 +9,9 @@
 
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
-export type RemoveTodoInput = {|
+export type RemoveTodoMutationVariables = {|
   id: string,
   userId: string,
-  clientMutationId?: ?string,
-|};
-export type RemoveTodoMutationVariables = {|
-  input: RemoveTodoInput
 |};
 export type RemoveTodoMutationResponse = {|
   +removeTodo: ?{|
@@ -35,9 +31,10 @@ export type RemoveTodoMutation = {|
 
 /*
 mutation RemoveTodoMutation(
-  $input: RemoveTodoInput!
+  $id: ID!
+  $userId: ID!
 ) {
-  removeTodo(input: $input) {
+  removeTodo(id: $id, userId: $userId) {
     deletedTodoId
     user {
       completedCount
@@ -52,16 +49,27 @@ const node/*: ConcreteRequest*/ = (function(){
 var v0 = [
   {
     "kind": "LocalArgument",
-    "name": "input",
-    "type": "RemoveTodoInput!",
+    "name": "id",
+    "type": "ID!",
+    "defaultValue": null
+  },
+  {
+    "kind": "LocalArgument",
+    "name": "userId",
+    "type": "ID!",
     "defaultValue": null
   }
 ],
 v1 = [
   {
     "kind": "Variable",
-    "name": "input",
-    "variableName": "input"
+    "name": "id",
+    "variableName": "id"
+  },
+  {
+    "kind": "Variable",
+    "name": "userId",
+    "variableName": "userId"
   }
 ],
 v2 = {
@@ -164,11 +172,11 @@ return {
     "operationKind": "mutation",
     "name": "RemoveTodoMutation",
     "id": null,
-    "text": "mutation RemoveTodoMutation(\n  $input: RemoveTodoInput!\n) {\n  removeTodo(input: $input) {\n    deletedTodoId\n    user {\n      completedCount\n      totalCount\n      id\n    }\n  }\n}\n",
+    "text": "mutation RemoveTodoMutation(\n  $id: ID!\n  $userId: ID!\n) {\n  removeTodo(id: $id, userId: $userId) {\n    deletedTodoId\n    user {\n      completedCount\n      totalCount\n      id\n    }\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = 'fd5052095c290ad9d2b30d377d3da474';
+(node/*: any*/).hash = 'e332dd9b37b7f8f9c04e13860a90ff26';
 module.exports = node;

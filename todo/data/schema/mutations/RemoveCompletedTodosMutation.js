@@ -13,37 +13,46 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import {mutationWithClientMutationId, toGlobalId} from 'graphql-relay';
-import {GraphQLID, GraphQLList, GraphQLNonNull, GraphQLString} from 'graphql';
+import {toGlobalId} from 'graphql-relay';
+import {
+  GraphQLID,
+  GraphQLList,
+  GraphQLObjectType,
+  GraphQLNonNull,
+  GraphQLString,
+} from 'graphql';
 import {GraphQLUser} from '../nodes';
 import {getUserOrThrow, removeCompletedTodos, User} from '../../database';
 
-type Input = {|
+type Input = {
   +userId: string,
-|};
+  ...
+};
 
 type Payload = {|
   +deletedTodoIds: $ReadOnlyArray<string>,
   +userId: string,
 |};
 
-const RemoveCompletedTodosMutation = mutationWithClientMutationId({
-  name: 'RemoveCompletedTodos',
-  inputFields: {
+const RemoveCompletedTodosMutation = {
+  args: {
     userId: {type: new GraphQLNonNull(GraphQLID)},
   },
-  outputFields: {
-    deletedTodoIds: {
-      type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
-      resolve: ({deletedTodoIds}: Payload): $ReadOnlyArray<string> =>
-        deletedTodoIds,
+  type: new GraphQLObjectType({
+    name: 'RemoveCompletedTodosPayload',
+    fields: {
+      deletedTodoIds: {
+        type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
+        resolve: ({deletedTodoIds}: Payload): $ReadOnlyArray<string> =>
+          deletedTodoIds,
+      },
+      user: {
+        type: new GraphQLNonNull(GraphQLUser),
+        resolve: ({userId}: Payload): User => getUserOrThrow(userId),
+      },
     },
-    user: {
-      type: new GraphQLNonNull(GraphQLUser),
-      resolve: ({userId}: Payload): User => getUserOrThrow(userId),
-    },
-  },
-  mutateAndGetPayload: ({userId}: Input): Payload => {
+  }),
+  resolve: (_: mixed, {userId}: Input): Payload => {
     const deletedTodoLocalIds = removeCompletedTodos();
 
     const deletedTodoIds = deletedTodoLocalIds.map(
@@ -52,6 +61,6 @@ const RemoveCompletedTodosMutation = mutationWithClientMutationId({
 
     return {deletedTodoIds, userId};
   },
-});
+};
 
 export {RemoveCompletedTodosMutation};

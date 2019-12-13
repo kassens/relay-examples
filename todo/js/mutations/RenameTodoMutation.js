@@ -20,14 +20,11 @@ import {
 
 import type {Todo_todo} from 'relay/Todo_todo.graphql';
 
-import type {
-  RenameTodoInput,
-  RenameTodoMutationResponse,
-} from 'relay/RenameTodoMutation.graphql';
+import type {RenameTodoMutationResponse} from 'relay/RenameTodoMutation.graphql';
 
 const mutation = graphql`
-  mutation RenameTodoMutation($input: RenameTodoInput!) {
-    renameTodo(input: $input) {
+  mutation RenameTodoMutation($id: ID!, $text: String!) {
+    renameTodo(id: $id, text: $text) {
       todo {
         id
         text
@@ -55,15 +52,11 @@ function commit(
   text: string,
   todo: Todo_todo,
 ): Disposable {
-  const input: RenameTodoInput = {
-    text,
-    id: todo.id,
-  };
-
   return commitMutation(environment, {
     mutation,
     variables: {
-      input,
+      text,
+      id: todo.id,
     },
     optimisticResponse: getOptimisticResponse(text, todo),
   });

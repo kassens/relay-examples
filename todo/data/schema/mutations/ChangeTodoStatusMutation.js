@@ -13,8 +13,13 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import {fromGlobalId, mutationWithClientMutationId} from 'graphql-relay';
-import {GraphQLBoolean, GraphQLID, GraphQLNonNull} from 'graphql';
+import {fromGlobalId} from 'graphql-relay';
+import {
+  GraphQLBoolean,
+  GraphQLID,
+  GraphQLObjectType,
+  GraphQLNonNull,
+} from 'graphql';
 import {GraphQLTodo, GraphQLUser} from '../nodes';
 import {
   changeTodoStatus,
@@ -24,40 +29,42 @@ import {
   User,
 } from '../../database';
 
-type Input = {|
+type Input = {
   +complete: boolean,
   +id: string,
   +userId: string,
-|};
+  ...
+};
 
 type Payload = {|
   +todoId: string,
   +userId: string,
 |};
 
-const ChangeTodoStatusMutation = mutationWithClientMutationId({
-  name: 'ChangeTodoStatus',
-  inputFields: {
+const ChangeTodoStatusMutation = {
+  args: {
     complete: {type: new GraphQLNonNull(GraphQLBoolean)},
     id: {type: new GraphQLNonNull(GraphQLID)},
     userId: {type: new GraphQLNonNull(GraphQLID)},
   },
-  outputFields: {
-    todo: {
-      type: new GraphQLNonNull(GraphQLTodo),
-      resolve: ({todoId}: Payload): Todo => getTodoOrThrow(todoId),
+  type: new GraphQLObjectType({
+    name: 'ChangeTodoStatusPayload',
+    fields: {
+      todo: {
+        type: new GraphQLNonNull(GraphQLTodo),
+        resolve: ({todoId}: Payload): Todo => getTodoOrThrow(todoId),
+      },
+      user: {
+        type: new GraphQLNonNull(GraphQLUser),
+        resolve: ({userId}: Payload): User => getUserOrThrow(userId),
+      },
     },
-    user: {
-      type: new GraphQLNonNull(GraphQLUser),
-      resolve: ({userId}: Payload): User => getUserOrThrow(userId),
-    },
-  },
-  mutateAndGetPayload: ({id, complete, userId}: Input): Payload => {
+  }),
+  resolve: (_: mixed, {id, complete, userId}: Input): Payload => {
     const todoId = fromGlobalId(id).id;
     changeTodoStatus(todoId, complete);
-
     return {todoId, userId};
   },
-});
+};
 
 export {ChangeTodoStatusMutation};

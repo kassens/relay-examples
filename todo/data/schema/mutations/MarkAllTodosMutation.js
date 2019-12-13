@@ -13,8 +13,13 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import {mutationWithClientMutationId} from 'graphql-relay';
-import {GraphQLBoolean, GraphQLID, GraphQLList, GraphQLNonNull} from 'graphql';
+import {
+  GraphQLBoolean,
+  GraphQLID,
+  GraphQLList,
+  GraphQLObjectType,
+  GraphQLNonNull,
+} from 'graphql';
 import {GraphQLTodo, GraphQLUser} from '../nodes';
 
 import {
@@ -25,38 +30,40 @@ import {
   User,
 } from '../../database';
 
-type Input = {|
+type Input = {
   +complete: boolean,
   +userId: string,
-|};
+  ...
+};
 
 type Payload = {|
   +changedTodoIds: $ReadOnlyArray<string>,
   +userId: string,
 |};
 
-const MarkAllTodosMutation = mutationWithClientMutationId({
-  name: 'MarkAllTodos',
-  inputFields: {
+const MarkAllTodosMutation = {
+  args: {
     complete: {type: new GraphQLNonNull(GraphQLBoolean)},
     userId: {type: new GraphQLNonNull(GraphQLID)},
   },
-  outputFields: {
-    changedTodos: {
-      type: new GraphQLList(new GraphQLNonNull(GraphQLTodo)),
-      resolve: ({changedTodoIds}: Payload): $ReadOnlyArray<Todo> =>
-        changedTodoIds.map((todoId: string): Todo => getTodoOrThrow(todoId)),
+  type: new GraphQLObjectType({
+    name: 'MarkAllTodosPayload',
+    fields: {
+      changedTodos: {
+        type: new GraphQLList(new GraphQLNonNull(GraphQLTodo)),
+        resolve: ({changedTodoIds}: Payload): $ReadOnlyArray<Todo> =>
+          changedTodoIds.map((todoId: string): Todo => getTodoOrThrow(todoId)),
+      },
+      user: {
+        type: new GraphQLNonNull(GraphQLUser),
+        resolve: ({userId}: Payload): User => getUserOrThrow(userId),
+      },
     },
-    user: {
-      type: new GraphQLNonNull(GraphQLUser),
-      resolve: ({userId}: Payload): User => getUserOrThrow(userId),
-    },
-  },
-  mutateAndGetPayload: ({complete, userId}: Input): Payload => {
+  }),
+  resolve: (_: mixed, {complete, userId}: Input): Payload => {
     const changedTodoIds = markAllTodos(complete);
-
     return {changedTodoIds, userId};
   },
-});
+};
 
 export {MarkAllTodosMutation};

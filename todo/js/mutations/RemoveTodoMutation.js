@@ -22,11 +22,10 @@ import {
 import {ConnectionHandler} from 'relay-runtime';
 import type {Todo_user} from 'relay/Todo_user.graphql';
 import type {Todo_todo} from 'relay/Todo_todo.graphql';
-import type {RemoveTodoInput} from 'relay/RemoveTodoMutation.graphql';
 
 const mutation = graphql`
-  mutation RemoveTodoMutation($input: RemoveTodoInput!) {
-    removeTodo(input: $input) {
+  mutation RemoveTodoMutation($id: ID!, $userId: ID!) {
+    removeTodo(id: $id, userId: $userId) {
       deletedTodoId
       user {
         completedCount
@@ -51,15 +50,11 @@ function commit(
   todo: Todo_todo,
   user: Todo_user,
 ): Disposable {
-  const input: RemoveTodoInput = {
-    id: todo.id,
-    userId: user.userId,
-  };
-
   return commitMutation(environment, {
     mutation,
     variables: {
-      input,
+      id: todo.id,
+      userId: user.userId,
     },
     updater: (store: RecordSourceSelectorProxy) => {
       const payload = store.getRootField('removeTodo');
